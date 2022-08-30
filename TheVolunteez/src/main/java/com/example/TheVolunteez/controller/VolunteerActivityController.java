@@ -1,12 +1,11 @@
 package com.example.TheVolunteez.controller;
 
 import com.example.TheVolunteez.dto.PostVolunteerDto;
-import com.example.TheVolunteez.entity.VolunteerActivity;
 import com.example.TheVolunteez.service.VolunteerActivityService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
@@ -16,8 +15,8 @@ public class VolunteerActivityController {
     private final VolunteerActivityService volunteerActivityService;
 
     @PostMapping("/post") // 봉사활동 게시글 올리기
-    public PostVolunteerDto postVolunteer(HttpServletRequest request, @RequestBody PostVolunteerDto postVolunteerDto) {
-        return volunteerActivityService.post(request, postVolunteerDto);
+    public PostVolunteerDto postVolunteer(Authentication authentication, @RequestBody PostVolunteerDto postVolunteerDto) {
+        return volunteerActivityService.post(authentication, postVolunteerDto);
     }
 
     @GetMapping("/post/{id}") // 봉사활동 게시글 찾기
@@ -26,8 +25,8 @@ public class VolunteerActivityController {
     }
 
     @PostMapping("/post/{id}/apply") // 봉사활동 참여하기 버튼
-    public String volunteerApply(HttpServletRequest request, @PathVariable("id") Long vid) {
-        return volunteerActivityService.volunteerApply(request, vid);
+    public String volunteerApply(Authentication authentication, @PathVariable("id") Long vid) {
+        return volunteerActivityService.volunteerApply(authentication, vid);
     }
 
     @GetMapping("/post/{id}/members") // 봉사활동 게시글에 참여한 멤버 확인
@@ -36,7 +35,7 @@ public class VolunteerActivityController {
     }
 
     @PostMapping("/post/{id}/like") // 좋아요 버튼
-    public String likeVolunteer(@PathVariable("id") Long vid, HttpServletRequest request) {
-        return volunteerActivityService.likeVolunteer(request, vid);
+    public String likeVolunteer(@PathVariable("id") Long vid, Authentication authentication) {
+        return volunteerActivityService.likeVolunteer(authentication, vid);
     }
 }
