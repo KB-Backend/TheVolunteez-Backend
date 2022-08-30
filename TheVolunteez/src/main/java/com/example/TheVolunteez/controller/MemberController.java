@@ -25,17 +25,7 @@ public class MemberController {
         memberService.signUp(signUpDto);
         return "회원가입 성공!";
     }
-
-    @GetMapping("/members") // 모든멤버 확인
-    public List<String> members() {
-        return memberService.showAllMembers();
-    }
-
-    @GetMapping("/member/current") // 현재멤버 확인
-    public String getCurrentUser(Authentication authentication) {
-        return memberService.getUser(authentication);
-    }
-
+    
     @GetMapping("/myLikeList") // 나의 좋아요 리스트
     public List<String> myLikeList(Authentication authentication) {
         return memberService.showLikeList(authentication);

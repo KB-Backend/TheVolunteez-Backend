@@ -40,19 +40,6 @@ public class MemberService {
         memberRepository.save(member);
     }
 
-    public List<String> showAllMembers() {
-        List<Member> members = memberRepository.findAll();
-        List<String> membersName = members.stream()
-                .map(m -> m.getName())
-                .collect(Collectors.toList());
-        return membersName;
-    }
-
-    public String getUser(Authentication authentication) {
-        UserDetails details = (UserDetails) authentication.getPrincipal();
-        return details.getUsername();
-    }
-
     public List<String> showLikeList(Authentication authentication) {
         UserDetails details = (UserDetails) authentication.getPrincipal();
         Member member = memberRepository.findByUserIdFetch(details.getUsername()).orElseThrow(
