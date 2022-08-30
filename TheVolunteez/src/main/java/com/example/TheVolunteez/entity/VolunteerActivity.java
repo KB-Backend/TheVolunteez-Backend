@@ -35,6 +35,9 @@ public class VolunteerActivity {
     private int currentPeople;
     private String contact;
 
+    @Enumerated(value = EnumType.STRING)
+    private VolunteerStatus volunteerStatus;
+
     @OneToMany(mappedBy = "volunteerActivity")
     private List<MemberVolunteer> memberList = new ArrayList<>();
 

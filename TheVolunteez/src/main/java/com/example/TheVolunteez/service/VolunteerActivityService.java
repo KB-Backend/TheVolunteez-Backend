@@ -7,6 +7,8 @@ import com.example.TheVolunteez.repository.MemberRepository;
 import com.example.TheVolunteez.repository.MemberVolunteerRepository;
 import com.example.TheVolunteez.repository.VolunteerActivityRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
@@ -24,12 +26,12 @@ public class VolunteerActivityService {
     private final MemberVolunteerRepository memberVolunteerRepository;
     private final LikeVolunteerRepository likeVolunteerRepository;
 
-    public PostVolunteerDto post(HttpServletRequest request, PostVolunteerDto postVolunteerDto) {
-        HttpSession session = request.getSession();
-        Long memberId = (Long) session.getAttribute("member");
-        String writerId = memberRepository.findById(memberId).orElseThrow(
-                () -> new NullPointerException("로그인 먼저 해주십쇼")
+    public PostVolunteerDto post(Authentication authentication, PostVolunteerDto postVolunteerDto) {
+        UserDetails details = (UserDetails) authentication.getPrincipal();
+        String writerId = memberRepository.findByUserId(details.getUsername()).orElseThrow(
+                () -> new NullPointerException("로그인 먼저")
         ).getUserId();
+
         volunteerActivityRepository.save(new VolunteerActivity(postVolunteerDto, writerId));
         postVolunteerDto.setWriterId(writerId);
         return postVolunteerDto;
@@ -39,11 +41,10 @@ public class VolunteerActivityService {
         return volunteerActivityRepository.findVolunteerDto(vid);
     }
 
-    public String volunteerApply(HttpServletRequest request, Long volunteerActivityId) {
-        HttpSession session = request.getSession();
-        Long memberId = (Long) session.getAttribute("member");
-        Member member = memberRepository.findById(memberId).orElseThrow(
-                () -> new NullPointerException("로그인 먼저 해주십쇼")
+    public String volunteerApply(Authentication authentication, Long volunteerActivityId) {
+        UserDetails details = (UserDetails) authentication.getPrincipal();
+        Member member = memberRepository.findByUserId(details.getUsername()).orElseThrow(
+                () -> new NullPointerException("로그인 먼저")
         );
         VolunteerActivity volunteerActivity = volunteerActivityRepository.findById(volunteerActivityId).orElseThrow(
                 () -> new NullPointerException("존재하지 않는 게시판인데요")
@@ -64,12 +65,12 @@ public class VolunteerActivityService {
         return memberList;
     }
 
-    public String likeVolunteer(HttpServletRequest request, Long vid) {
-        HttpSession session = request.getSession();
-        Long memberId = (Long) session.getAttribute("member");
-        Member member = memberRepository.findById(memberId).orElseThrow(
+    public String likeVolunteer(Authentication authentication, Long vid) {
+        UserDetails details = (UserDetails) authentication.getPrincipal();
+        Member member = memberRepository.findByUserId(details.getUsername()).orElseThrow(
                 () -> new NullPointerException("로그인 먼저")
         );
+
         VolunteerActivity volunteerActivity = volunteerActivityRepository.findById(vid).orElseThrow(
                 () -> new NullPointerException("존재하지 않는 게시판")
         );
