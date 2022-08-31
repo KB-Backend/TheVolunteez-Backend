@@ -32,7 +32,6 @@ public class MemberVolunteer {
     }
 
     public void apply() {
-        this.volunteerStatus = VolunteerStatus.PARTICIPATING;
         volunteerActivity.addMember(this);
         member.addVolunteer(this);
     }

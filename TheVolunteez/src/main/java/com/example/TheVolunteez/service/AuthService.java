@@ -7,7 +7,6 @@ import com.example.TheVolunteez.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletRequest;
 
 @Service
 @RequiredArgsConstructor

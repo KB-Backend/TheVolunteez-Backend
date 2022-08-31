@@ -25,7 +25,7 @@ public class MemberController {
         memberService.signUp(signUpDto);
         return "회원가입 성공!";
     }
-    
+
     @GetMapping("/myLikeList") // 나의 좋아요 리스트
     public List<String> myLikeList(Authentication authentication) {
         return memberService.showLikeList(authentication);

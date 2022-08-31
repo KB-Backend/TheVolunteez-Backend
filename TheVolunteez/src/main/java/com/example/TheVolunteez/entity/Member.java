@@ -91,7 +91,7 @@ public class Member implements UserDetails {
     @OneToOne(mappedBy = "member", cascade = CascadeType.ALL)
     private LikeList likeList;
 
-    public void initLikeList(LikeList likeList) {
+    public void resetLikeList(LikeList likeList) {
         this.likeList = likeList;
     }
 
