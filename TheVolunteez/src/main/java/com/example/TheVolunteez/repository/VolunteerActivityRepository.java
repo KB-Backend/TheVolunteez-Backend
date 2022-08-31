@@ -3,6 +3,8 @@ package com.example.TheVolunteez.repository;
 import com.example.TheVolunteez.dto.PostVolunteerDto;
 import com.example.TheVolunteez.entity.Member;
 import com.example.TheVolunteez.entity.VolunteerActivity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -20,5 +22,7 @@ public interface VolunteerActivityRepository extends JpaRepository<VolunteerActi
 
     @Query("select v from VolunteerActivity v join fetch v.memberList vm join fetch vm.member")
     Optional<VolunteerActivity> findByIdFetch(Long id);
+
+    Page<VolunteerActivity> findByTitleContaining(String searchKeyword, Pageable pageable);
 
 }

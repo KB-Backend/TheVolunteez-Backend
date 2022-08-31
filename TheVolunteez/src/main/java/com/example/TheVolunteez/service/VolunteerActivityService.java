@@ -7,14 +7,13 @@ import com.example.TheVolunteez.repository.MemberRepository;
 import com.example.TheVolunteez.repository.MemberVolunteerRepository;
 import com.example.TheVolunteez.repository.VolunteerActivityRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,6 +24,20 @@ public class VolunteerActivityService {
     private final MemberRepository memberRepository;
     private final MemberVolunteerRepository memberVolunteerRepository;
     private final LikeVolunteerRepository likeVolunteerRepository;
+
+
+    public Page<PostVolunteerDto> findAllVolunteers(Pageable pageable) {
+
+        Page<VolunteerActivity> page = volunteerActivityRepository.findAll(pageable);
+        return page.map(v -> new PostVolunteerDto(v.getWriterId(), v.getTitle(), v.getDescription(), v.getDeadline(), v.getStartDate(), v.getEndDate(),
+                v.getPlace(), v.getVolunteerHour(), v.getMaxPeople(), v.getContact()));
+    }
+
+    public Page<PostVolunteerDto> findSearchVolunteers(String searchKeyword, Pageable pageable) {
+        Page<VolunteerActivity> page = volunteerActivityRepository.findByTitleContaining(searchKeyword, pageable);
+        return page.map(v -> new PostVolunteerDto(v.getWriterId(), v.getTitle(), v.getDescription(), v.getDeadline(), v.getStartDate(), v.getEndDate(),
+                v.getPlace(), v.getVolunteerHour(), v.getMaxPeople(), v.getContact()));
+    }
 
     public PostVolunteerDto post(Authentication authentication, PostVolunteerDto postVolunteerDto) {
         UserDetails details = (UserDetails) authentication.getPrincipal();
@@ -54,6 +67,8 @@ public class VolunteerActivityService {
         memberVolunteerRepository.save(memberVolunteer);
         return "apply 성공!";
     }
+
+
 
     public List<String> volunteerMemberNameList (Long vid) {
         VolunteerActivity volunteerActivity = volunteerActivityRepository.findByIdFetch(vid).orElseThrow(
