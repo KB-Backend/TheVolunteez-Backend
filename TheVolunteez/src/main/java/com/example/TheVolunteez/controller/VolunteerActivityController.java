@@ -23,14 +23,14 @@ public class VolunteerActivityController {
     private final VolunteerActivityService volunteerActivityService;
     private final VolunteerActivityRepository volunteerActivityRepository;
 
-//    @PostConstruct // 게시글 검색 기능 or 페이징 기능 테스트용 데이터
-//    public void init() {
-//        for (int i = 0; i < 100; i++) {
-//            PostVolunteerDto postVolunteerDto = new PostVolunteerDto("acg6138" + i, "제목" + i, "설명" + i, new Date(), new Date(), new Date(), "장소" + i,
-//                    i, i, "연락처" + i);
-//            volunteerActivityRepository.save(new VolunteerActivity(postVolunteerDto, "writerId" + 1));
-//        }
-//    }
+    @PostConstruct // 게시글 검색 기능 or 페이징 기능 테스트용 데이터
+    public void init() {
+        for (int i = 0; i < 100; i++) {
+            PostVolunteerDto postVolunteerDto = new PostVolunteerDto("acg6138" + i, "제목" + i, "설명" + i, new Date(), new Date(), new Date(), "장소" + i,
+                    i, i, "연락처" + i);
+            volunteerActivityRepository.save(new VolunteerActivity(postVolunteerDto, "writerId" + 1));
+        }
+    }
 
     @GetMapping("/board/list") // 봉사활동 전체 게시글
     public Page<PostVolunteerDto> getAllVolunteers(@PageableDefault(size = 15, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,

@@ -20,9 +20,6 @@ public interface VolunteerActivityRepository extends JpaRepository<VolunteerActi
             "from VolunteerActivity va where va.id = :va_id")
     PostVolunteerDto findVolunteerDto(@Param("va_id") Long volunteerId);
 
-    @Query("select v from VolunteerActivity v join fetch v.memberList vm join fetch vm.member")
-    Optional<VolunteerActivity> findByIdFetch(Long id);
-
     Page<VolunteerActivity> findByTitleContaining(String searchKeyword, Pageable pageable);
 
 }

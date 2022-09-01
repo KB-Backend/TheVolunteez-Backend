@@ -15,12 +15,11 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class VolunteerActivity {
+public class VolunteerActivity extends BaseTimeEntity {
 
     @Id @GeneratedValue
     @Column(name = "volunteer_activity_id")
     private Long id;
-
     private String writerId;
     private String title;
     private String description;
@@ -30,6 +29,7 @@ public class VolunteerActivity {
     private Date startDate;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date endDate;
+    private long period;
     private int volunteerHour;
     private String place;
     private int maxPeople;
@@ -57,6 +57,7 @@ public class VolunteerActivity {
         this.maxPeople = postVolunteerDto.getMaxPeople();
         this.contact = postVolunteerDto.getContact();
         this.volunteerStatus = VolunteerStatus.PARTICIPATING;
+        this.period = postVolunteerDto.getPeriod();
     }
 
     public void addMember(MemberVolunteer memberVolunteer) {
