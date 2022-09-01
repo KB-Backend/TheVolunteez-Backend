@@ -20,6 +20,7 @@ public class PostVolunteerDto {
     private int volunteerHour;
     private int maxPeople;
     private String contact;
+    private long period;
 
     public PostVolunteerDto(String writerId, String title, String description, Date deadline, Date startDate, Date endDate, String place, int volunteerHour, int maxPeople, String contact) {
         this.writerId = writerId;
@@ -32,5 +33,6 @@ public class PostVolunteerDto {
         this.volunteerHour = volunteerHour;
         this.maxPeople = maxPeople;
         this.contact = contact;
+        this.period = (endDate.getTime() - startDate.getTime()) / (1000*60*60*24);
     }
 }

@@ -27,7 +27,6 @@ public class VolunteerActivityService {
 
 
     public Page<PostVolunteerDto> findAllVolunteers(Pageable pageable) {
-
         Page<VolunteerActivity> page = volunteerActivityRepository.findAll(pageable);
         return page.map(v -> new PostVolunteerDto(v.getWriterId(), v.getTitle(), v.getDescription(), v.getDeadline(), v.getStartDate(), v.getEndDate(),
                 v.getPlace(), v.getVolunteerHour(), v.getMaxPeople(), v.getContact()));
@@ -45,8 +44,9 @@ public class VolunteerActivityService {
                 () -> new NullPointerException("로그인 먼저")
         ).getUserId();
 
-        volunteerActivityRepository.save(new VolunteerActivity(postVolunteerDto, writerId));
+        VolunteerActivity volunteerActivity = volunteerActivityRepository.save(new VolunteerActivity(postVolunteerDto, writerId));
         postVolunteerDto.setWriterId(writerId);
+        postVolunteerDto.setPeriod(volunteerActivity.getPeriod());
         return postVolunteerDto;
     }
 
@@ -71,7 +71,7 @@ public class VolunteerActivityService {
 
 
     public List<String> volunteerMemberNameList (Long vid) {
-        VolunteerActivity volunteerActivity = volunteerActivityRepository.findByIdFetch(vid).orElseThrow(
+        VolunteerActivity volunteerActivity = volunteerActivityRepository.findById(vid).orElseThrow(
                 () -> new NullPointerException("존재하지 않는 게시판인데요")
         );
         List<String> memberList = volunteerActivity.getMemberList().stream()
