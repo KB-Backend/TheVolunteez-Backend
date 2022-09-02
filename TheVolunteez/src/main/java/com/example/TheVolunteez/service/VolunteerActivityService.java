@@ -79,4 +79,14 @@ public class VolunteerActivityService {
         likeVolunteerRepository.save(likeVolunteer);
         return "좋아요 성공!";
     }
+
+    public String volunteerDelete(Long vid){
+        volunteerActivityRepository.deleteVolunteerDto(vid);
+
+        return "게시글이 삭제되었습니다.";
+    }
+
+    public PostVolunteerDto updatePost(Long vid){
+        return volunteerActivityRepository.updateVolunteerDto(vid);
+    }
 }

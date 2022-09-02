@@ -21,4 +21,9 @@ public interface VolunteerActivityRepository extends JpaRepository<VolunteerActi
     @Query("select v from VolunteerActivity v join fetch v.memberList vm join fetch vm.member")
     Optional<VolunteerActivity> findByIdFetch(Long id);
 
+    @Query()
+    PostVolunteerDto deleteVolunteerDto(Long volunteerId);
+
+    @Query()
+    PostVolunteerDto updateVolunteerDto(Long volunteerId);
 }
