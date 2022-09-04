@@ -35,14 +35,15 @@ public class VolunteerActivity extends BaseTimeEntity {
     private int maxPeople;
     private int currentPeople;
     private String contact;
+    private int likeCount;
 
     @Enumerated(value = EnumType.STRING)
     private VolunteerStatus volunteerStatus;
 
-    @OneToMany(mappedBy = "volunteerActivity")
+    @OneToMany(mappedBy = "volunteerActivity", cascade = CascadeType.PERSIST)
     private List<MemberVolunteer> memberList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "volunteerActivity")
+    @OneToMany(mappedBy = "volunteerActivity", cascade = CascadeType.PERSIST)
     private List<LikeVolunteer> likeVolunteers = new ArrayList<>();
 
     public VolunteerActivity(PostVolunteerDto postVolunteerDto, String writerId) {
@@ -58,6 +59,7 @@ public class VolunteerActivity extends BaseTimeEntity {
         this.contact = postVolunteerDto.getContact();
         this.volunteerStatus = VolunteerStatus.PARTICIPATING;
         this.period = postVolunteerDto.getPeriod();
+        this.currentPeople = 0;
     }
 
     public void addMember(MemberVolunteer memberVolunteer) {
@@ -67,4 +69,34 @@ public class VolunteerActivity extends BaseTimeEntity {
     public void addLikeMember(LikeVolunteer likeVolunteer) {
         this.likeVolunteers.add(likeVolunteer);
     }
+
+    public void editVolunteerActivity(PostVolunteerDto postVolunteerDto) {
+        this.title = postVolunteerDto.getTitle();
+        this.description = postVolunteerDto.getDescription();
+        this.deadline = postVolunteerDto.getDeadline();
+        this.startDate = postVolunteerDto.getStartDate();
+        this.endDate = postVolunteerDto.getEndDate();
+        this.volunteerHour = postVolunteerDto.getVolunteerHour();
+        this.place = postVolunteerDto.getPlace();
+        this.maxPeople = postVolunteerDto.getMaxPeople();
+        this.contact = postVolunteerDto.getContact();
+        this.period = postVolunteerDto.getPeriod();
+    }
+
+    public void plusCurrentPeople() {
+        this.currentPeople += 1;
+    }
+
+    public void minusCurrentPeople() {
+        this.currentPeople -= 1;
+    }
+
+    public void plusLikeCount() {
+        this.likeCount += 1;
+    }
+
+    public void minusLikeCount() {
+        this.likeCount -= 1;
+    }
+
 }

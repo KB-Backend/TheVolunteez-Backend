@@ -3,12 +3,14 @@ package com.example.TheVolunteez.entity;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.persistence.*;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@ToString
 public class LikeVolunteer {
 
     @Id @GeneratedValue
@@ -32,4 +34,5 @@ public class LikeVolunteer {
         this.likeList.addLikeVolunteer(this);
         this.volunteerActivity.addLikeMember(this);
     }
+
 }

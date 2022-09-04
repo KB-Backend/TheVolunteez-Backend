@@ -9,7 +9,6 @@ import java.util.Optional;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findByUserId(String userId);
-
     @Query("select m from Member m join fetch m.likeList ml " +
             "join fetch ml.likeVolunteers mlv " +
             "join fetch mlv.volunteerActivity " +
