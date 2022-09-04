@@ -1,5 +1,6 @@
 package com.example.TheVolunteez.entity;
 
+import com.example.TheVolunteez.dto.EditMemberDto;
 import com.example.TheVolunteez.dto.SignUpDto;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -28,6 +29,7 @@ public class Member extends BaseTimeEntity implements UserDetails {
     private String userId;
     private String password;
     private String name;
+    private String nickname;
     private String phoneNumber;
     private String email;
     private String address;
@@ -73,10 +75,11 @@ public class Member extends BaseTimeEntity implements UserDetails {
     }
 
     @Builder
-    public Member(String userId, String password, String name, String phoneNumber, String email, String address, String university, List<String> roles, Gender gender) {
+    public Member(String userId, String password, String name, String nickname, String phoneNumber, String email, String address, String university, List<String> roles, Gender gender) {
         this.userId = userId;
         this.password = password;
         this.name = name;
+        this.nickname = nickname;
         this.phoneNumber = phoneNumber;
         this.email = email;
         this.address = address;
@@ -97,5 +100,13 @@ public class Member extends BaseTimeEntity implements UserDetails {
 
     public void addVolunteer(MemberVolunteer memberVolunteer) {
         this.volunteerList.add(memberVolunteer);
+    }
+
+    public void editMember(EditMemberDto editMemberDto) {
+        this.nickname = editMemberDto.getNickname();
+        this.phoneNumber = editMemberDto.getPhoneNumber();
+        this.email = editMemberDto.getEmail();
+        this.address = editMemberDto.getAddress();
+        this.university = editMemberDto.getUniversity();
     }
 }
