@@ -3,6 +3,7 @@ package com.example.TheVolunteez.entity;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -11,6 +12,7 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@ToString
 public class LikeList {
 
     @Id @GeneratedValue
@@ -21,7 +23,7 @@ public class LikeList {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @OneToMany(mappedBy = "likeList")
+    @OneToMany(mappedBy = "likeList", cascade = CascadeType.ALL)
     private List<LikeVolunteer> likeVolunteers = new ArrayList<>();
 
     public LikeList(Member member) {

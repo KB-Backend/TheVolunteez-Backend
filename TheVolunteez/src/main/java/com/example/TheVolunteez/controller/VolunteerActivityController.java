@@ -28,8 +28,8 @@ public class VolunteerActivityController {
     @PostConstruct // 게시글 검색 기능 or 페이징 기능 테스트용 데이터
     public void init() {
         for (int i = 0; i < 100; i++) {
-            PostVolunteerDto postVolunteerDto = new PostVolunteerDto("acg6138" + i, "제목" + i, "설명" + i, new Date(), new Date(), new Date(), "장소" + i,
-                    i, i, "연락처" + i);
+            PostVolunteerDto postVolunteerDto = new PostVolunteerDto("acg6138" + i, "제목" + i, "설명" + i, new Date(2022,9,4), new Date(2022,9,4), new Date(2022,9,i), "장소" + i,
+                    i,i,i, "연락처" + i);
             volunteerActivityRepository.save(new VolunteerActivity(postVolunteerDto, "writerId" + 1));
         }
     }
@@ -37,11 +37,30 @@ public class VolunteerActivityController {
     @GetMapping("/board/list") // 봉사활동 전체 게시글
     public Page<PostVolunteerDto> getAllVolunteers(@PageableDefault(size = 15, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
                                                    String search) {
-        System.out.println("searchKeyword = " + search);
         if(search == null) { // 검색한게 없을 때
             return volunteerActivityService.findAllVolunteers(pageable);
         }else{ // 검색 키워드가 있을 때
             return volunteerActivityService.findSearchVolunteers(search, pageable);
+        }
+    }
+
+    @GetMapping("/board/list/short-term")
+    public Page<PostVolunteerDto> getShortTermVolunteer(@PageableDefault(size = 15, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
+                                                   String search) {
+        if(search == null) { // 검색한게 없을 때
+            return volunteerActivityService.findShortTermVolunteers(pageable);
+        }else{ // 검색 키워드가 있을 때
+            return volunteerActivityService.findShortTermBySearch(search, pageable);
+        }
+    }
+
+    @GetMapping("/board/list/long-term")
+    public Page<PostVolunteerDto> getLongTermVolunteer(@PageableDefault(size = 15, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
+                                                     String search) {
+        if(search == null) { // 검색한게 없을 때
+            return volunteerActivityService.findLongTermVolunteers(pageable);
+        }else{ // 검색 키워드가 있을 때
+            return volunteerActivityService.findLongTermBySearch(search, pageable);
         }
     }
 
@@ -50,24 +69,25 @@ public class VolunteerActivityController {
         return volunteerActivityService.post(authentication, postVolunteerDto);
     }
 
-
     @GetMapping("/board/{id}") // 봉사활동 게시글 페이지
     public PostVolunteerDto findVolunteer(@PathVariable("id") Long vid) {
-        return volunteerActivityService.findVolunteer(vid);
+        return volunteerActivityRepository.findVolunteerDto(vid);
     }
-
 
     @PostMapping("/board/{id}/apply") // 봉사활동 참여하기 버튼
     public String volunteerApply(Authentication authentication, @PathVariable("id") Long vid) {
         return volunteerActivityService.volunteerApply(authentication, vid);
     }
 
+    @PostMapping("/board/{id}/cancel") // 봉사활동 취소
+    public String volunteerCancel(Authentication authentication, @PathVariable("id") Long vid) {
+        return volunteerActivityService.cancelApply(authentication, vid);
+    }
 
     @GetMapping("/board/{id}/members") // 봉사활동 게시글에 참여한 멤버 확인
     public List<String> volunteerMemberList(@PathVariable("id") Long vid) {
         return volunteerActivityService.volunteerMemberNameList(vid);
     }
-
 
     @PostMapping("/board/{id}/like") // 좋아요 버튼
     public String likeVolunteer(@PathVariable("id") Long vid, Authentication authentication) {
