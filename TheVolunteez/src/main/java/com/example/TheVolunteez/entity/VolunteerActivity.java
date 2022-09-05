@@ -2,6 +2,7 @@ package com.example.TheVolunteez.entity;
 
 import com.example.TheVolunteez.dto.PostVolunteerDto;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -14,12 +15,11 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class VolunteerActivity {
+public class VolunteerActivity extends BaseTimeEntity {
 
     @Id @GeneratedValue
     @Column(name = "volunteer_activity_id")
     private Long id;
-
     private String writerId;
     private String title;
     private String description;
@@ -29,6 +29,7 @@ public class VolunteerActivity {
     private Date startDate;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date endDate;
+    private long period;
     private int volunteerHour;
     private String place;
     private int maxPeople;
@@ -45,6 +46,7 @@ public class VolunteerActivity {
     private List<LikeVolunteer> likeVolunteers = new ArrayList<>();
 
     public VolunteerActivity(PostVolunteerDto postVolunteerDto, String writerId) {
+        this.writerId = writerId;
         this.title = postVolunteerDto.getTitle();
         this.description = postVolunteerDto.getDescription();
         this.deadline = postVolunteerDto.getDeadline();
@@ -54,7 +56,8 @@ public class VolunteerActivity {
         this.place = postVolunteerDto.getPlace();
         this.maxPeople = postVolunteerDto.getMaxPeople();
         this.contact = postVolunteerDto.getContact();
-        this.writerId = writerId;
+        this.volunteerStatus = VolunteerStatus.PARTICIPATING;
+        this.period = postVolunteerDto.getPeriod();
     }
 
     public void addMember(MemberVolunteer memberVolunteer) {
@@ -64,4 +67,5 @@ public class VolunteerActivity {
     public void addLikeMember(LikeVolunteer likeVolunteer) {
         this.likeVolunteers.add(likeVolunteer);
     }
+
 }

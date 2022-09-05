@@ -11,8 +11,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -36,7 +34,7 @@ public class MemberService {
                         .userId(signUpDto.getUserId())
                         .password(passwordEncoder.encode(signUpDto.getPassword()))
                         .build();
-        member.initLikeList(new LikeList(member));
+        member.resetLikeList(new LikeList(member));
         memberRepository.save(member);
     }
 

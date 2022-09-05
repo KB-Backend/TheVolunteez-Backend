@@ -7,14 +7,14 @@ import com.example.TheVolunteez.repository.MemberRepository;
 import com.example.TheVolunteez.repository.MemberVolunteerRepository;
 import com.example.TheVolunteez.repository.VolunteerActivityRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,14 +26,28 @@ public class VolunteerActivityService {
     private final MemberVolunteerRepository memberVolunteerRepository;
     private final LikeVolunteerRepository likeVolunteerRepository;
 
+
+    public Page<PostVolunteerDto> findAllVolunteers(Pageable pageable) {
+        Page<VolunteerActivity> page = volunteerActivityRepository.findAll(pageable);
+        return page.map(v -> new PostVolunteerDto(v.getWriterId(), v.getTitle(), v.getDescription(), v.getDeadline(), v.getStartDate(), v.getEndDate(),
+                v.getPlace(), v.getVolunteerHour(), v.getMaxPeople(), v.getContact()));
+    }
+
+    public Page<PostVolunteerDto> findSearchVolunteers(String searchKeyword, Pageable pageable) {
+        Page<VolunteerActivity> page = volunteerActivityRepository.findByTitleContaining(searchKeyword, pageable);
+        return page.map(v -> new PostVolunteerDto(v.getWriterId(), v.getTitle(), v.getDescription(), v.getDeadline(), v.getStartDate(), v.getEndDate(),
+                v.getPlace(), v.getVolunteerHour(), v.getMaxPeople(), v.getContact()));
+    }
+
     public PostVolunteerDto post(Authentication authentication, PostVolunteerDto postVolunteerDto) {
         UserDetails details = (UserDetails) authentication.getPrincipal();
         String writerId = memberRepository.findByUserId(details.getUsername()).orElseThrow(
                 () -> new NullPointerException("로그인 먼저")
         ).getUserId();
 
-        volunteerActivityRepository.save(new VolunteerActivity(postVolunteerDto, writerId));
+        VolunteerActivity volunteerActivity = volunteerActivityRepository.save(new VolunteerActivity(postVolunteerDto, writerId));
         postVolunteerDto.setWriterId(writerId);
+        postVolunteerDto.setPeriod(volunteerActivity.getPeriod());
         return postVolunteerDto;
     }
 
@@ -55,8 +69,10 @@ public class VolunteerActivityService {
         return "apply 성공!";
     }
 
+
+
     public List<String> volunteerMemberNameList (Long vid) {
-        VolunteerActivity volunteerActivity = volunteerActivityRepository.findByIdFetch(vid).orElseThrow(
+        VolunteerActivity volunteerActivity = volunteerActivityRepository.findById(vid).orElseThrow(
                 () -> new NullPointerException("존재하지 않는 게시판인데요")
         );
         List<String> memberList = volunteerActivity.getMemberList().stream()
@@ -80,13 +96,20 @@ public class VolunteerActivityService {
         return "좋아요 성공!";
     }
 
-    public String volunteerDelete(Long vid){
-        volunteerActivityRepository.deleteVolunteerDto(vid);
+    @Transactional()
+    public String volunteerDelete(Authentication authentication, Long vid){
+        UserDetails details = (UserDetails) authentication.getPrincipal();
+        String writerId = memberRepository.findByUserId(details.getUsername()).
+                orElseThrow(() -> new NullPointerException("로그인 먼저")).getUserId();
 
+        VolunteerActivity post = volunteerActivityRepository.findById(vid).orElseThrow(()
+        -> new NullPointerException("게시물이 존재하지 않습니다."));
+
+        if(volunteerActivityRepository.findVolunteerDto(vid).getWriterId().equals(writerId)){
+            volunteerActivityRepository.delete(post);
+        }else{
+            return "게시글 삭제 권한이 없습니다.";
+        }
         return "게시글이 삭제되었습니다.";
-    }
-
-    public PostVolunteerDto updatePost(Long vid){
-        return volunteerActivityRepository.updateVolunteerDto(vid);
     }
 }
