@@ -95,20 +95,6 @@ public class VolunteerActivityService {
         return "수정 성공";
     }
 
-    public String deleteVolunteerActivity(Authentication authentication, Long vid) throws IllegalAccessException {
-        UserDetails details = (UserDetails) authentication.getPrincipal();
-        String userId = details.getUsername();
-        VolunteerActivity volunteerActivity = volunteerActivityRepository.findById(vid).orElseThrow(
-                () -> new NullPointerException("없는 게시판")
-        );
-        if (userId.equals(volunteerActivity.getWriterId())) {
-            volunteerActivityRepository.delete(volunteerActivity);
-        }else{
-            throw new IllegalAccessException("권한이 없습니다");
-        }
-        return "삭제 성공";
-    }
-
     public String volunteerApply(Authentication authentication, Long vid) {
         UserDetails details = (UserDetails) authentication.getPrincipal();
         Member member = memberRepository.findByUserId(details.getUsername()).orElseThrow(
