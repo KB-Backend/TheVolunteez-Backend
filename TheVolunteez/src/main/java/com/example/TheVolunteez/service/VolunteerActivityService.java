@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -173,5 +174,22 @@ public class VolunteerActivityService {
             likeVolunteerRepository.delete(likeVolunteer.get());
             return "좋아요 취소 성공";
         }
+    }
+
+    @Transactional()
+    public String volunteerDelete(Authentication authentication, Long vid){
+        UserDetails details = (UserDetails) authentication.getPrincipal();
+        String writerId = memberRepository.findByUserId(details.getUsername()).
+                orElseThrow(() -> new NullPointerException("로그인 먼저")).getUserId();
+
+        VolunteerActivity post = volunteerActivityRepository.findById(vid).orElseThrow(()
+        -> new NullPointerException("게시물이 존재하지 않습니다."));
+
+        if(volunteerActivityRepository.findVolunteerDto(vid).getWriterId().equals(writerId)){
+            volunteerActivityRepository.delete(post);
+        }else{
+            return "게시글 삭제 권한이 없습니다.";
+        }
+        return "게시글이 삭제되었습니다.";
     }
 }

@@ -1,9 +1,12 @@
 package com.example.TheVolunteez.dto;
 
 import com.example.TheVolunteez.entity.Gender;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public class SignUpDto {
     private String userId;
     private String password;

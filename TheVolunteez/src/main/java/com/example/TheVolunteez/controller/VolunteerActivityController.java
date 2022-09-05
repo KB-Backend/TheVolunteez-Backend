@@ -10,13 +10,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.annotation.PostConstruct;
 import java.util.Date;
 import java.util.List;
 
-@RestController
+@RestController()
 @RequiredArgsConstructor
 public class VolunteerActivityController {
 
@@ -67,27 +69,11 @@ public class VolunteerActivityController {
         return volunteerActivityService.post(authentication, postVolunteerDto);
     }
 
-    @GetMapping("/board/{id}") // 봉사활동 게시글 상세 페이지
+    @GetMapping("/board/{id}") // 봉사활동 게시글 페이지
     public PostVolunteerDto findVolunteer(@PathVariable("id") Long vid) {
         return volunteerActivityRepository.findVolunteerDto(vid);
     }
 
-    @GetMapping("/board/{id}/edit") // 게시글 수정 페이지
-    public PostVolunteerDto getEditDetail(@PathVariable("id") Long vid) {
-        return volunteerActivityRepository.findVolunteerDto(vid);
-    }
-
-    @PatchMapping("/board/{id}/edit") // 게시글 수정
-    public String editVolunteerActivity(Authentication authentication, @RequestBody PostVolunteerDto postVolunteerDto,
-                                        @PathVariable("id") Long vid) throws IllegalAccessException {
-        volunteerActivityService.editVolunteerActivity(authentication, postVolunteerDto, vid);
-        return "수정 성공";
-    }
-
-    @DeleteMapping("/board/{id}/delete")
-    public String deleteVolunteer(Authentication authentication, @PathVariable("id") Long vid) throws IllegalAccessException {
-        return volunteerActivityService.deleteVolunteerActivity(authentication, vid);
-    }
     @PostMapping("/board/{id}/apply") // 봉사활동 참여하기 버튼
     public String volunteerApply(Authentication authentication, @PathVariable("id") Long vid) {
         return volunteerActivityService.volunteerApply(authentication, vid);
@@ -97,6 +83,7 @@ public class VolunteerActivityController {
     public String volunteerCancel(Authentication authentication, @PathVariable("id") Long vid) {
         return volunteerActivityService.cancelApply(authentication, vid);
     }
+
     @GetMapping("/board/{id}/members") // 봉사활동 게시글에 참여한 멤버 확인
     public List<String> volunteerMemberList(@PathVariable("id") Long vid) {
         return volunteerActivityService.volunteerMemberNameList(vid);
@@ -107,4 +94,8 @@ public class VolunteerActivityController {
         return volunteerActivityService.likeVolunteer(authentication, vid);
     }
 
+    @DeleteMapping("/board/{id}/delete") //봉사 게시글 삭제
+    public String volunteerDelete(@PathVariable("id") Long vid, Authentication authentication){
+        return volunteerActivityService.volunteerDelete(authentication, vid);
+    }
 }

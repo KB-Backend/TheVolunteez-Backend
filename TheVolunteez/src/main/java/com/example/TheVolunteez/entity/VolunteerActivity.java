@@ -98,5 +98,4 @@ public class VolunteerActivity extends BaseTimeEntity {
     public void minusLikeCount() {
         this.likeCount -= 1;
     }
-
 }
