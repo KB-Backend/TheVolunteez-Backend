@@ -5,18 +5,16 @@ import com.example.TheVolunteez.entity.VolunteerActivity;
 import com.example.TheVolunteez.repository.VolunteerActivityRepository;
 import com.example.TheVolunteez.service.VolunteerActivityService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.annotation.PostConstruct;
+import javax.validation.Valid;
 import java.util.Date;
 import java.util.List;
 
@@ -67,7 +65,7 @@ public class VolunteerActivityController {
     }
 
     @PostMapping("/board/post") // 봉사활동 게시글 올리기
-    public PostVolunteerDto postVolunteer(Authentication authentication, @RequestBody PostVolunteerDto postVolunteerDto, BindingResult bindingResult) {
+    public PostVolunteerDto postVolunteer(Authentication authentication, @Valid @RequestBody PostVolunteerDto postVolunteerDto) {
 
         return volunteerActivityService.post(authentication, postVolunteerDto);
     }
@@ -103,7 +101,7 @@ public class VolunteerActivityController {
     }
 
     @PatchMapping("/board/{id}/edit") // 게시글 수정
-    public String editVolunteerActivity(Authentication authentication, @RequestBody PostVolunteerDto postVolunteerDto,
+    public String editVolunteerActivity(Authentication authentication, @Valid @RequestBody PostVolunteerDto postVolunteerDto,
                                         @PathVariable("id") Long vid) throws IllegalAccessException {
         volunteerActivityService.editVolunteerActivity(authentication, postVolunteerDto, vid);
         return "수정 성공";

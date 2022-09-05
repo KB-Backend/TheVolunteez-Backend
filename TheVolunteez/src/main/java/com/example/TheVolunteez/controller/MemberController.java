@@ -8,13 +8,17 @@ import com.example.TheVolunteez.entity.Member;
 import com.example.TheVolunteez.repository.MemberRepository;
 import com.example.TheVolunteez.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
+import javax.validation.Valid;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -42,7 +46,7 @@ public class MemberController {
     }
 
     @PostMapping("/signup") // 회원가입
-    public String signUp(@RequestBody SignUpDto signUpDto) {
+    public String signUp(@Valid @RequestBody SignUpDto signUpDto) {
         memberService.signUp(signUpDto);
         return "회원가입 성공!";
     }
@@ -63,7 +67,7 @@ public class MemberController {
     }
 
     @PatchMapping("/member/edit")
-    public String editMember(Authentication authentication, @RequestBody EditMemberDto editMemberDto) {
+    public String editMember(Authentication authentication, @Valid @RequestBody EditMemberDto editMemberDto) {
         return memberService.editMember(authentication, editMemberDto);
     }
 
