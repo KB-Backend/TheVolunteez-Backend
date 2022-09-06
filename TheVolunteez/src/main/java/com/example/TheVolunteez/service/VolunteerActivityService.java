@@ -41,6 +41,13 @@ public class VolunteerActivityService {
                 v.getPlace(), v.getVolunteerHour(), v.getMaxPeople(), v.getCurrentPeople(), v.getContact()));
     }
 
+    public Page<PostVolunteerDto> findSearchZoneVolunteers(String searchKeyword, Pageable pageable){
+        Page<VolunteerActivity> page = volunteerActivityRepository.findZone(searchKeyword, pageable);
+
+        return page.map(v -> new PostVolunteerDto(v.getWriterId(), v.getTitle(), v.getDescription(), v.getDeadline(), v.getStartDate(), v.getEndDate(),
+                v.getPlace(), v.getVolunteerHour(), v.getMaxPeople(), v.getCurrentPeople(), v.getContact()));
+    }
+
     public Page<PostVolunteerDto> findShortTermVolunteers(Pageable pageable) {
         Page<VolunteerActivity> page = volunteerActivityRepository.findShortTerm(pageable);
 

@@ -1,7 +1,9 @@
 package com.example.TheVolunteez.controller;
 
 import com.example.TheVolunteez.dto.PostVolunteerDto;
+import com.example.TheVolunteez.entity.Member;
 import com.example.TheVolunteez.entity.VolunteerActivity;
+import com.example.TheVolunteez.repository.MemberRepository;
 import com.example.TheVolunteez.repository.VolunteerActivityRepository;
 import com.example.TheVolunteez.service.VolunteerActivityService;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,6 +20,7 @@ import javax.annotation.PostConstruct;
 import javax.validation.Valid;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @RestController()
 @RequiredArgsConstructor
@@ -24,6 +28,8 @@ public class VolunteerActivityController {
 
     private final VolunteerActivityService volunteerActivityService;
     private final VolunteerActivityRepository volunteerActivityRepository;
+
+    private final MemberRepository memberRepository;
 
     @PostConstruct // 게시글 검색 기능 or 페이징 기능 테스트용 데이터
     public void init() {
@@ -41,6 +47,24 @@ public class VolunteerActivityController {
             return volunteerActivityService.findAllVolunteers(pageable);
         }else{ // 검색 키워드가 있을 때
             return volunteerActivityService.findSearchVolunteers(search, pageable);
+        }
+    }
+
+    @GetMapping("/board/list/zone")
+    public Page<PostVolunteerDto> getSearchZoneVolunteers(@PageableDefault(size = 15, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
+                                                          String search, Authentication authentication){
+        UserDetails details = (UserDetails) authentication.getPrincipal();
+        Optional<Member> member = memberRepository.findByUserId(details.getUsername());
+
+        if(search == null){
+            if(member.isEmpty()) {
+                return volunteerActivityService.findAllVolunteers(pageable);
+            }else{
+                String targetZone = member.get().getAddress();
+                return volunteerActivityService.findSearchZoneVolunteers(targetZone, pageable);
+            }
+        }else{
+            return volunteerActivityService.findSearchZoneVolunteers(search, pageable);
         }
     }
 
