@@ -13,16 +13,16 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-@RestController()
+@RestController
 @RequiredArgsConstructor
 public class VolunteerActivityController {
 
@@ -35,8 +35,8 @@ public class VolunteerActivityController {
     public void init() {
         for (int i = 0; i < 100; i++) {
             PostVolunteerDto postVolunteerDto = new PostVolunteerDto("acg6138" + i, "제목" + i, "설명" + i, new Date(2022,9,4), new Date(2022,9,4), new Date(2022,9,i), "장소" + i,
-                    i,i,i, "연락처" + i);
-            volunteerActivityRepository.save(new VolunteerActivity(postVolunteerDto, "writerId" + 1));
+                    i,i,i, "연락처" + i, new ArrayList<>());
+            volunteerActivityRepository.save(new VolunteerActivity(postVolunteerDto, "writerId" + 1, new ArrayList<>()));
         }
     }
 
@@ -96,7 +96,7 @@ public class VolunteerActivityController {
 
     @GetMapping("/board/{id}") // 봉사활동 게시글 페이지
     public PostVolunteerDto findVolunteer(@PathVariable("id") Long vid) {
-        return volunteerActivityRepository.findVolunteerDto(vid);
+        return volunteerActivityService.getVolunteerDto(vid);
     }
 
     @PostMapping("/board/{id}/apply") // 봉사활동 참여하기 버튼
@@ -121,7 +121,7 @@ public class VolunteerActivityController {
 
     @GetMapping("/board/{id}/edit") // 게시글 수정 페이지
     public PostVolunteerDto getEditDetail(@PathVariable("id") Long vid) {
-        return volunteerActivityRepository.findVolunteerDto(vid);
+        return volunteerActivityService.getVolunteerDto(vid);
     }
 
     @PatchMapping("/board/{id}/edit") // 게시글 수정

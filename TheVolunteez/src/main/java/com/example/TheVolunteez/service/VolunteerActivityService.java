@@ -2,10 +2,7 @@ package com.example.TheVolunteez.service;
 
 import com.example.TheVolunteez.dto.PostVolunteerDto;
 import com.example.TheVolunteez.entity.*;
-import com.example.TheVolunteez.repository.LikeVolunteerRepository;
-import com.example.TheVolunteez.repository.MemberRepository;
-import com.example.TheVolunteez.repository.MemberVolunteerRepository;
-import com.example.TheVolunteez.repository.VolunteerActivityRepository;
+import com.example.TheVolunteez.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -26,54 +24,55 @@ public class VolunteerActivityService {
     private final MemberRepository memberRepository;
     private final MemberVolunteerRepository memberVolunteerRepository;
     private final LikeVolunteerRepository likeVolunteerRepository;
+    private final TagRepository tagRepository;
 
 
     public Page<PostVolunteerDto> findAllVolunteers(Pageable pageable) {
         Page<VolunteerActivity> page = volunteerActivityRepository.findAll(pageable);
         return page.map(v -> new PostVolunteerDto(v.getWriterId(), v.getTitle(), v.getDescription(), v.getDeadline(), v.getStartDate(), v.getEndDate(),
-                v.getPlace(), v.getVolunteerHour(), v.getMaxPeople(), v.getCurrentPeople(), v.getContact()));
+                v.getPlace(), v.getVolunteerHour(), v.getMaxPeople(), v.getCurrentPeople(), v.getContact(), v.getVolunteerTags().stream().map(t -> t.getTagName()).collect(Collectors.toList())));
     }
 
     public Page<PostVolunteerDto> findSearchVolunteers(String searchKeyword, Pageable pageable) {
         Page<VolunteerActivity> page = volunteerActivityRepository.findByTitleContaining(searchKeyword, pageable);
 
         return page.map(v -> new PostVolunteerDto(v.getWriterId(), v.getTitle(), v.getDescription(), v.getDeadline(), v.getStartDate(), v.getEndDate(),
-                v.getPlace(), v.getVolunteerHour(), v.getMaxPeople(), v.getCurrentPeople(), v.getContact()));
+                v.getPlace(), v.getVolunteerHour(), v.getMaxPeople(), v.getCurrentPeople(), v.getContact(), v.getVolunteerTags().stream().map(t -> t.getTagName()).collect(Collectors.toList())));
     }
 
     public Page<PostVolunteerDto> findSearchZoneVolunteers(String searchKeyword, Pageable pageable){
         Page<VolunteerActivity> page = volunteerActivityRepository.findZone(searchKeyword, pageable);
 
         return page.map(v -> new PostVolunteerDto(v.getWriterId(), v.getTitle(), v.getDescription(), v.getDeadline(), v.getStartDate(), v.getEndDate(),
-                v.getPlace(), v.getVolunteerHour(), v.getMaxPeople(), v.getCurrentPeople(), v.getContact()));
+                v.getPlace(), v.getVolunteerHour(), v.getMaxPeople(), v.getCurrentPeople(), v.getContact(), v.getVolunteerTags().stream().map(t -> t.getTagName()).collect(Collectors.toList())));
     }
 
     public Page<PostVolunteerDto> findShortTermVolunteers(Pageable pageable) {
         Page<VolunteerActivity> page = volunteerActivityRepository.findShortTerm(pageable);
 
         return page.map(v -> new PostVolunteerDto(v.getWriterId(), v.getTitle(), v.getDescription(), v.getDeadline(), v.getStartDate(), v.getEndDate(),
-                v.getPlace(), v.getVolunteerHour(), v.getMaxPeople(), v.getCurrentPeople(), v.getContact()));
+                v.getPlace(), v.getVolunteerHour(), v.getMaxPeople(), v.getCurrentPeople(), v.getContact(), v.getVolunteerTags().stream().map(t -> t.getTagName()).collect(Collectors.toList())));
     }
 
     public Page<PostVolunteerDto> findShortTermBySearch(String searchKeyword, Pageable pageable) {
         Page<VolunteerActivity> page = volunteerActivityRepository.findShortTermBySearch(searchKeyword, pageable);
 
         return page.map(v -> new PostVolunteerDto(v.getWriterId(), v.getTitle(), v.getDescription(), v.getDeadline(), v.getStartDate(), v.getEndDate(),
-                v.getPlace(), v.getVolunteerHour(), v.getMaxPeople(), v.getCurrentPeople(), v.getContact()));
+                v.getPlace(), v.getVolunteerHour(), v.getMaxPeople(), v.getCurrentPeople(), v.getContact(), v.getVolunteerTags().stream().map(t -> t.getTagName()).collect(Collectors.toList())));
     }
 
     public Page<PostVolunteerDto> findLongTermVolunteers(Pageable pageable) {
         Page<VolunteerActivity> page = volunteerActivityRepository.findLongTerm(pageable);
 
         return page.map(v -> new PostVolunteerDto(v.getWriterId(), v.getTitle(), v.getDescription(), v.getDeadline(), v.getStartDate(), v.getEndDate(),
-                v.getPlace(), v.getVolunteerHour(), v.getMaxPeople(), v.getCurrentPeople(), v.getContact()));
+                v.getPlace(), v.getVolunteerHour(), v.getMaxPeople(), v.getCurrentPeople(), v.getContact(), v.getVolunteerTags().stream().map(t -> t.getTagName()).collect(Collectors.toList())));
     }
 
     public Page<PostVolunteerDto> findLongTermBySearch(String searchKeyword, Pageable pageable) {
         Page<VolunteerActivity> page = volunteerActivityRepository.findLongTermBySearch(searchKeyword, pageable);
 
         return page.map(v -> new PostVolunteerDto(v.getWriterId(), v.getTitle(), v.getDescription(), v.getDeadline(), v.getStartDate(), v.getEndDate(),
-                v.getPlace(), v.getVolunteerHour(), v.getMaxPeople(), v.getCurrentPeople(), v.getContact()));
+                v.getPlace(), v.getVolunteerHour(), v.getMaxPeople(), v.getCurrentPeople(), v.getContact(), v.getVolunteerTags().stream().map(t -> t.getTagName()).collect(Collectors.toList())));
     }
 
     public PostVolunteerDto post(Authentication authentication, PostVolunteerDto postVolunteerDto) {
@@ -81,11 +80,23 @@ public class VolunteerActivityService {
         String writerId = memberRepository.findByUserId(details.getUsername()).orElseThrow(
                 () -> new NullPointerException("로그인 먼저")
         ).getUserId();
-
-        VolunteerActivity volunteerActivity = volunteerActivityRepository.save(new VolunteerActivity(postVolunteerDto, writerId));
+        VolunteerActivity volunteerActivity = new VolunteerActivity(postVolunteerDto, writerId, new ArrayList<>());
         postVolunteerDto.setWriterId(writerId);
         postVolunteerDto.setPeriod(volunteerActivity.getPeriod());
-        return postVolunteerDto;
+
+        List<Tag> tags = postVolunteerDto.getTags().stream().map(t -> tagRepository.findByName(t).get()).collect(Collectors.toList());
+        for (Tag tag : tags) {
+            new VolunteerTag(tag, volunteerActivity);
+        }
+        VolunteerActivity v = volunteerActivityRepository.save(volunteerActivity);
+        return new PostVolunteerDto(v.getWriterId(), v.getTitle(), v.getDescription(), v.getDeadline(), v.getStartDate(), v.getEndDate(),
+                v.getPlace(), v.getVolunteerHour(), v.getMaxPeople(), v.getCurrentPeople(), v.getContact(), v.getVolunteerTags().stream().map(t -> t.getTagName()).collect(Collectors.toList()));
+    }
+
+    public PostVolunteerDto getVolunteerDto(Long vid) {
+        VolunteerActivity v = volunteerActivityRepository.findById(vid).get();
+        return new PostVolunteerDto(v.getWriterId(), v.getTitle(), v.getDescription(), v.getDeadline(), v.getStartDate(), v.getEndDate(),
+                v.getPlace(), v.getVolunteerHour(), v.getMaxPeople(), v.getCurrentPeople(), v.getContact(),v.getVolunteerTags().stream().map(t -> t.getTagName()).collect(Collectors.toList()));
     }
 
     public String editVolunteerActivity(Authentication authentication, PostVolunteerDto postVolunteerDto, Long vid) throws IllegalAccessException {
@@ -98,7 +109,7 @@ public class VolunteerActivityService {
             volunteerActivityRepository.save(volunteerActivity);
         }else{
             throw new IllegalAccessException("권한이 없습니다");
-        };
+        }
         return "수정 성공";
     }
 
@@ -178,7 +189,7 @@ public class VolunteerActivityService {
         VolunteerActivity post = volunteerActivityRepository.findById(vid).orElseThrow(()
         -> new NullPointerException("게시물이 존재하지 않습니다."));
 
-        if(volunteerActivityRepository.findVolunteerDto(vid).getWriterId().equals(writerId)){
+        if(volunteerActivityRepository.findById(vid).get().getWriterId().equals(writerId)){
             volunteerActivityRepository.delete(post);
         }else{
             return "게시글 삭제 권한이 없습니다.";
