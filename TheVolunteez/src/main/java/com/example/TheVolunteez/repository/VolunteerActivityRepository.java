@@ -17,6 +17,9 @@ public interface VolunteerActivityRepository extends JpaRepository<VolunteerActi
 
     Page<VolunteerActivity> findByTitleContaining(String searchKeyword, Pageable pageable);
 
+    @Query("select v from VolunteerActivity v where v.address like %:searchKeyword")
+    Page<VolunteerActivity> findZone(@Param("searchKeyword") String searchKeyword, Pageable pageable);
+
     @Query("select v from VolunteerActivity v where v.title like %:searchKeyword and v.period <= 3")
     Page<VolunteerActivity> findShortTermBySearch(@Param("searchKeyword") String searchKeyword, Pageable pageable);
 
