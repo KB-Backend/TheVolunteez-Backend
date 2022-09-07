@@ -4,14 +4,18 @@ import com.example.TheVolunteez.dto.EditMemberDto;
 import com.example.TheVolunteez.dto.SignUpDto;
 import com.example.TheVolunteez.entity.LikeList;
 import com.example.TheVolunteez.entity.Member;
+import com.example.TheVolunteez.entity.MemberTag;
+import com.example.TheVolunteez.entity.Tag;
 import com.example.TheVolunteez.repository.MemberRepository;
+import com.example.TheVolunteez.repository.MemberTagRepository;
+import com.example.TheVolunteez.repository.TagRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -24,7 +28,7 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
-
+    private final TagRepository tagRepository;
     public void signUp(SignUpDto signUpDto) {
         Member member = Member.builder()
                         .roles(Collections.singletonList("ROLE_USER"))
@@ -35,8 +39,15 @@ public class MemberService {
                         .phoneNumber(signUpDto.getPhoneNumber())
                         .userId(signUpDto.getUserId())
                         .password(passwordEncoder.encode(signUpDto.getPassword()))
+                        .nickname(signUpDto.getNickname())
+                        .gender(signUpDto.getGender())
+                        .memberTags(new ArrayList<>())
                         .build();
         member.resetLikeList(new LikeList(member));
+        List<Tag> tags = signUpDto.getTags().stream().map(t -> tagRepository.findByName(t).get()).collect(Collectors.toList());
+        for (Tag tag:tags) {
+            MemberTag memberTag = new MemberTag(tag, member);
+        }
         memberRepository.save(member);
     }
 

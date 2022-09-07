@@ -1,6 +1,7 @@
 package com.example.TheVolunteez.dto;
 
 import com.example.TheVolunteez.entity.Gender;
+import com.example.TheVolunteez.entity.Tag;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,6 +9,9 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -42,8 +46,9 @@ public class SignUpDto {
     private String university;
 
     private Gender gender;
+    private List<String> tags;
 
-    public SignUpDto(String userId, String password, String name, String nickname, String phoneNumber, String email, String address, String university, Gender gender) {
+    public SignUpDto(String userId, String password, String name, String nickname, String phoneNumber, String email, String address, String university, Gender gender, List<String> tags) {
         this.userId = userId;
         this.password = password;
         this.name = name;
@@ -53,6 +58,7 @@ public class SignUpDto {
         this.address = address;
         this.university = university;
         this.gender = gender;
+        this.tags = tags;
     }
 }
 

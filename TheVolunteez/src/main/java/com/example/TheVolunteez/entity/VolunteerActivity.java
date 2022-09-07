@@ -2,7 +2,6 @@ package com.example.TheVolunteez.entity;
 
 import com.example.TheVolunteez.dto.PostVolunteerDto;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -40,13 +39,16 @@ public class VolunteerActivity extends BaseTimeEntity {
     @Enumerated(value = EnumType.STRING)
     private VolunteerStatus volunteerStatus;
 
-    @OneToMany(mappedBy = "volunteerActivity", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "volunteerActivity", cascade = CascadeType.ALL)
     private List<MemberVolunteer> memberList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "volunteerActivity", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "volunteerActivity", cascade = CascadeType.ALL)
     private List<LikeVolunteer> likeVolunteers = new ArrayList<>();
 
-    public VolunteerActivity(PostVolunteerDto postVolunteerDto, String writerId) {
+    @OneToMany(mappedBy = "volunteerActivity", cascade = CascadeType.ALL)
+    private List<VolunteerTag> volunteerTags = new ArrayList<>();
+
+    public VolunteerActivity(PostVolunteerDto postVolunteerDto, String writerId, List<VolunteerTag> volunteerTags) {
         this.writerId = writerId;
         this.title = postVolunteerDto.getTitle();
         this.description = postVolunteerDto.getDescription();
@@ -60,6 +62,7 @@ public class VolunteerActivity extends BaseTimeEntity {
         this.volunteerStatus = VolunteerStatus.PARTICIPATING;
         this.period = postVolunteerDto.getPeriod();
         this.currentPeople = 0;
+        this.volunteerTags = volunteerTags;
     }
 
     public void addMember(MemberVolunteer memberVolunteer) {
@@ -69,6 +72,8 @@ public class VolunteerActivity extends BaseTimeEntity {
     public void addLikeMember(LikeVolunteer likeVolunteer) {
         this.likeVolunteers.add(likeVolunteer);
     }
+
+    public void addVolunteerTag(VolunteerTag volunteerTag) { this.volunteerTags.add(volunteerTag);}
 
     public void editVolunteerActivity(PostVolunteerDto postVolunteerDto) {
         this.title = postVolunteerDto.getTitle();

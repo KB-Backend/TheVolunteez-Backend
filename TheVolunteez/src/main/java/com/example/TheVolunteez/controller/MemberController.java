@@ -2,14 +2,13 @@ package com.example.TheVolunteez.controller;
 
 import com.example.TheVolunteez.dto.EditMemberDto;
 import com.example.TheVolunteez.dto.SignUpDto;
-import com.example.TheVolunteez.entity.Gender;
-import com.example.TheVolunteez.entity.LikeList;
-import com.example.TheVolunteez.entity.Member;
-import com.example.TheVolunteez.repository.MemberRepository;
+import com.example.TheVolunteez.entity.*;
+import com.example.TheVolunteez.repository.*;
 import com.example.TheVolunteez.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +18,8 @@ import javax.validation.Valid;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -27,23 +28,27 @@ public class MemberController {
     private final MemberService memberService;
     private final PasswordEncoder passwordEncoder;
     private final MemberRepository memberRepository;
+    private final VolunteerActivityRepository volunteerActivityRepository;
+    private final TagRepository tagRepository;
+    private final MemberTagRepository memberTagRepository;
+    private final MemberVolunteerRepository memberVolunteerRepository;
 
-    @PostConstruct
-    public void init() {
-        Member member = Member.builder()
-                .roles(Collections.singletonList("ROLE_USER"))
-                .university("단국대학교")
-                .phoneNumber("01084145255")
-                .password(passwordEncoder.encode("wjddn6138"))
-                .name("이정우")
-                .userId("acg6138")
-                .address("수지")
-                .email("acg6138@naver.com")
-                .gender(Gender.MALE)
-                .build();
-        member.resetLikeList(new LikeList(member));
-        memberRepository.save(member);
-    }
+//    @PostConstruct
+//    public void init() {
+//        Member member = Member.builder()
+//                .roles(Collections.singletonList("ROLE_USER"))
+//                .university("단국대학교")
+//                .phoneNumber("01084145255")
+//                .password(passwordEncoder.encode("wjddn6138"))
+//                .name("이정우")
+//                .userId("acg6138")
+//                .address("수지")
+//                .email("acg6138@naver.com")
+//                .gender(Gender.MALE)
+//                .build();
+//        member.resetLikeList(new LikeList(member));
+//        memberRepository.save(member);
+//    }
 
     @PostMapping("/signup") // 회원가입
     public String signUp(@Valid @RequestBody SignUpDto signUpDto) {
@@ -54,11 +59,6 @@ public class MemberController {
     @GetMapping("/member/myLikeList") // 나의 좋아요 리스트
     public List<String> myLikeList(Authentication authentication) {
         return memberService.showLikeList(authentication);
-    }
-
-    @GetMapping("/member/current")
-    public String getMember(Authentication authentication) {
-        return memberService.getMember(authentication);
     }
 
     @GetMapping("/member/edit")

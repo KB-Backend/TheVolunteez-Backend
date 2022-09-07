@@ -35,6 +35,17 @@ public class Member extends BaseTimeEntity implements UserDetails {
     private String address;
     private String university;
 
+    @Builder.Default
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    private List<MemberVolunteer> volunteerList = new ArrayList<>();
+
+    @OneToOne(mappedBy = "member", cascade = CascadeType.ALL)
+    private LikeList likeList;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    private List<MemberTag> memberTags = new ArrayList<>();
+
     @Enumerated(value = EnumType.STRING)
     private Gender gender;
 
@@ -75,7 +86,7 @@ public class Member extends BaseTimeEntity implements UserDetails {
     }
 
     @Builder
-    public Member(String userId, String password, String name, String nickname, String phoneNumber, String email, String address, String university, List<String> roles, Gender gender) {
+    public Member(String userId, String password, String name, String nickname, String phoneNumber, String email, String address, String university, List<String> roles, Gender gender, List<MemberTag> tags) {
         this.userId = userId;
         this.password = password;
         this.name = name;
@@ -86,13 +97,8 @@ public class Member extends BaseTimeEntity implements UserDetails {
         this.university = university;
         this.roles = roles;
         this.gender = gender;
+        this.memberTags = tags;
     }
-
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-    private List<MemberVolunteer> volunteerList = new ArrayList<>();
-
-    @OneToOne(mappedBy = "member", cascade = CascadeType.ALL)
-    private LikeList likeList;
 
     public void resetLikeList(LikeList likeList) {
         this.likeList = likeList;
@@ -102,6 +108,10 @@ public class Member extends BaseTimeEntity implements UserDetails {
         this.volunteerList.add(memberVolunteer);
     }
 
+    public void addMemberTag(MemberTag memberTag) {
+        this.memberTags.add(memberTag);
+    }
+
     public void editMember(EditMemberDto editMemberDto) {
         this.nickname = editMemberDto.getNickname();
         this.phoneNumber = editMemberDto.getPhoneNumber();
@@ -109,4 +119,5 @@ public class Member extends BaseTimeEntity implements UserDetails {
         this.address = editMemberDto.getAddress();
         this.university = editMemberDto.getUniversity();
     }
+
 }

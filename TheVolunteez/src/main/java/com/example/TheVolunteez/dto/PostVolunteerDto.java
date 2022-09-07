@@ -9,6 +9,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -42,12 +43,11 @@ public class PostVolunteerDto {
 
     @NotBlank(message = "연락 정보는 필수 값입니다.")
     private String contact;
-
-    @Min(value = 0, message = "기간을 다시 설정해주세요.")
     private long period;
     private int currentPeople;
+    private List<String> tags;
 
-    public PostVolunteerDto(String writerId, String title, String description, Date deadline, Date startDate, Date endDate, String place, int volunteerHour, int maxPeople, int currentPeople, String contact) {
+    public PostVolunteerDto(String writerId, String title, String description, Date deadline, Date startDate, Date endDate, String place, int volunteerHour, int maxPeople, int currentPeople, String contact, List<String> tags) {
         this.writerId = writerId;
         this.title = title;
         this.description = description;
@@ -60,5 +60,6 @@ public class PostVolunteerDto {
         this.contact = contact;
         this.period = (endDate.getTime() - startDate.getTime()) / (1000*60*60*24);
         this.currentPeople = currentPeople;
+        this.tags = tags;
     }
 }
