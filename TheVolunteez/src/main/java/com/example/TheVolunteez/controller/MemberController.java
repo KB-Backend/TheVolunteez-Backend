@@ -28,27 +28,32 @@ public class MemberController {
     private final MemberService memberService;
     private final PasswordEncoder passwordEncoder;
     private final MemberRepository memberRepository;
-    private final VolunteerActivityRepository volunteerActivityRepository;
     private final TagRepository tagRepository;
-    private final MemberTagRepository memberTagRepository;
-    private final MemberVolunteerRepository memberVolunteerRepository;
 
-//    @PostConstruct
-//    public void init() {
-//        Member member = Member.builder()
-//                .roles(Collections.singletonList("ROLE_USER"))
-//                .university("단국대학교")
-//                .phoneNumber("01084145255")
-//                .password(passwordEncoder.encode("wjddn6138"))
-//                .name("이정우")
-//                .userId("acg6138")
-//                .address("수지")
-//                .email("acg6138@naver.com")
-//                .gender(Gender.MALE)
-//                .build();
-//        member.resetLikeList(new LikeList(member));
-//        memberRepository.save(member);
-//    }
+    @GetMapping("/")
+    public void init() {
+        Member member = Member.builder()
+                .roles(Collections.singletonList("ROLE_USER"))
+                .university("단국대학교")
+                .phoneNumber("01084145255")
+                .password(passwordEncoder.encode("wjddn6138"))
+                .name("이정우")
+                .userId("acg6138")
+                .address("수지")
+                .email("acg6138@naver.com")
+                .gender(Gender.MALE)
+                .memberTags(new ArrayList<>())
+                .build();
+        member.resetLikeList(new LikeList(member));
+        List<String> a = new ArrayList<>();
+        a.add("봉사4");
+        a.add("봉사5");
+        List<Tag> tags = a.stream().map(t -> tagRepository.findByName(t).get()).collect(Collectors.toList());
+        for (Tag tag:tags) {
+            MemberTag memberTag = new MemberTag(tag, member);
+        }
+        memberRepository.save(member);
+    }
 
     @PostMapping("/signup") // 회원가입
     public String signUp(@Valid @RequestBody SignUpDto signUpDto) {

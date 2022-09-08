@@ -75,6 +75,26 @@ public class VolunteerActivityService {
                 v.getPlace(), v.getVolunteerHour(), v.getMaxPeople(), v.getCurrentPeople(), v.getContact(), v.getVolunteerTags().stream().map(t -> t.getTagName()).collect(Collectors.toList())));
     }
 
+    public Page<PostVolunteerDto> findMyPick(Authentication authentication, Pageable pageable) {
+        UserDetails details = (UserDetails) authentication.getPrincipal();
+        Optional<Member> member = memberRepository.findByUserId(details.getUsername());
+        List<Long> idList = volunteerActivityRepository.findMyPick(member.get().getId());
+        Page<VolunteerActivity> page = volunteerActivityRepository.findMyPickVolunteer(idList, pageable);
+
+        return page.map(v -> new PostVolunteerDto(v.getWriterId(), v.getTitle(), v.getDescription(), v.getDeadline(), v.getStartDate(), v.getEndDate(),
+                v.getPlace(), v.getVolunteerHour(), v.getMaxPeople(), v.getCurrentPeople(), v.getContact(), v.getVolunteerTags().stream().map(t -> t.getTagName()).collect(Collectors.toList())));
+    }
+
+    public Page<PostVolunteerDto> findMyPickBySearch(Authentication authentication, String search, Pageable pageable) {
+        UserDetails details = (UserDetails) authentication.getPrincipal();
+        Optional<Member> member = memberRepository.findByUserId(details.getUsername());
+        List<Long> idList = volunteerActivityRepository.findMyPick(member.get().getId());
+        Page<VolunteerActivity> page = volunteerActivityRepository.findMyPickVolunteerBySearch(idList, search, pageable);
+
+        return page.map(v -> new PostVolunteerDto(v.getWriterId(), v.getTitle(), v.getDescription(), v.getDeadline(), v.getStartDate(), v.getEndDate(),
+                v.getPlace(), v.getVolunteerHour(), v.getMaxPeople(), v.getCurrentPeople(), v.getContact(), v.getVolunteerTags().stream().map(t -> t.getTagName()).collect(Collectors.toList())));
+    }
+
     public PostVolunteerDto post(Authentication authentication, PostVolunteerDto postVolunteerDto) {
         UserDetails details = (UserDetails) authentication.getPrincipal();
         String writerId = memberRepository.findByUserId(details.getUsername()).orElseThrow(
