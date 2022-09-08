@@ -12,7 +12,7 @@ public class VolunteerTag {
 
     @Id
     @GeneratedValue
-    @Column(name = "volunteer_tag")
+    @Column(name = "volunteer_tag_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)

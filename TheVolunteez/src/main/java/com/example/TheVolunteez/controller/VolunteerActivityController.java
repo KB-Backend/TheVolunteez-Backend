@@ -2,8 +2,11 @@ package com.example.TheVolunteez.controller;
 
 import com.example.TheVolunteez.dto.PostVolunteerDto;
 import com.example.TheVolunteez.entity.Member;
+import com.example.TheVolunteez.entity.Tag;
 import com.example.TheVolunteez.entity.VolunteerActivity;
+import com.example.TheVolunteez.entity.VolunteerTag;
 import com.example.TheVolunteez.repository.MemberRepository;
+import com.example.TheVolunteez.repository.TagRepository;
 import com.example.TheVolunteez.repository.VolunteerActivityRepository;
 import com.example.TheVolunteez.service.VolunteerActivityService;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -28,15 +32,25 @@ public class VolunteerActivityController {
 
     private final VolunteerActivityService volunteerActivityService;
     private final VolunteerActivityRepository volunteerActivityRepository;
-
+    private final TagRepository tagRepository;
     private final MemberRepository memberRepository;
 
     @PostConstruct // 게시글 검색 기능 or 페이징 기능 테스트용 데이터
     public void init() {
-        for (int i = 0; i < 100; i++) {
+        List<String> dqd = new ArrayList<>();
+        dqd.add("봉사1");
+        dqd.add("봉사2");
+        dqd.add("봉사3");
+
+        for (int i = 0; i < 5; i++) {
             PostVolunteerDto postVolunteerDto = new PostVolunteerDto("acg6138" + i, "제목" + i, "설명" + i, new Date(2022,9,4), new Date(2022,9,4), new Date(2022,9,i), "장소" + i,
-                    i,i,i, "연락처" + i, new ArrayList<>());
-            volunteerActivityRepository.save(new VolunteerActivity(postVolunteerDto, "writerId" + 1, new ArrayList<>()));
+                    i,i,i, "연락처" + i, dqd);
+            VolunteerActivity volunteerActivity = new VolunteerActivity(postVolunteerDto, "writerId" + 1, new ArrayList<>());
+            List<Tag> tags = postVolunteerDto.getTags().stream().map(t -> tagRepository.findByName(t).get()).collect(Collectors.toList());
+            for (Tag tag : tags) {
+                new VolunteerTag(tag, volunteerActivity);
+            }
+            volunteerActivityRepository.save(volunteerActivity);
         }
     }
 
@@ -68,7 +82,7 @@ public class VolunteerActivityController {
         }
     }
 
-    @GetMapping("/board/list/short-term")
+    @GetMapping("/board/list/short-term") // 단기
     public Page<PostVolunteerDto> getShortTermVolunteer(@PageableDefault(size = 15, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
                                                    String search) {
         if(search == null) { // 검색한게 없을 때
@@ -78,7 +92,7 @@ public class VolunteerActivityController {
         }
     }
 
-    @GetMapping("/board/list/long-term")
+    @GetMapping("/board/list/long-term") // 장기
     public Page<PostVolunteerDto> getLongTermVolunteer(@PageableDefault(size = 15, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
                                                      String search) {
         if(search == null) { // 검색한게 없을 때
@@ -88,6 +102,15 @@ public class VolunteerActivityController {
         }
     }
 
+    @GetMapping("/board/list/mypick") // MyPick
+    public Page<PostVolunteerDto> getMyPickVolunteer(@PageableDefault(size = 15, sort = "VOLUNTEER_ACTIVITY_ID", direction = Sort.Direction.DESC) Pageable pageable,
+                                                     String search, Authentication authentication) {
+        if(search == null) { // 검색한게 없을 때
+            return volunteerActivityService.findMyPick(authentication, pageable);
+        }else{ // 검색 키워드가 있을 때
+            return volunteerActivityService.findMyPickBySearch(authentication, search, pageable);
+        }
+    }
     @PostMapping("/board/post") // 봉사활동 게시글 올리기
     public PostVolunteerDto postVolunteer(Authentication authentication, @Valid @RequestBody PostVolunteerDto postVolunteerDto) {
 

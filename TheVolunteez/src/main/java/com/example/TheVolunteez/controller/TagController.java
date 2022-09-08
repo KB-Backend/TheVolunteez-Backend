@@ -3,11 +3,9 @@ package com.example.TheVolunteez.controller;
 import com.example.TheVolunteez.entity.Tag;
 import com.example.TheVolunteez.repository.TagRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.PostConstruct;
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
