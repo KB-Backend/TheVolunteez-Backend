@@ -34,13 +34,7 @@ public class MemberController {
     public void init() {
         Member member = Member.builder()
                 .roles(Collections.singletonList("ROLE_USER"))
-                .university("단국대학교")
-                .phoneNumber("01084145255")
-                .password(passwordEncoder.encode("wjddn6138"))
-                .name("이정우")
-                .userId("acg6138")
                 .address("수지")
-                .email("acg6138@naver.com")
                 .gender(Gender.MALE)
                 .memberTags(new ArrayList<>())
                 .build();
